@@ -1,4 +1,4 @@
-# PsychoPyGeneric
+# CogBehaviorKit
 
 A small, configuration-driven toolbox for **visual behavioral experiments** with PsychoPy. You describe an
 experiment in one Python dictionary (screen, stimuli, trial events, design, keys); the toolbox runs it,
