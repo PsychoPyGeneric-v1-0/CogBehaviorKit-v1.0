@@ -1,0 +1,296 @@
+{
+  "status": "completed",
+  "started": "2026-11-03 10:49:56",
+  "finished": "2026-11-03 10:50:29",
+  "participant": {
+    "participant": "S01",
+    "session": "1",
+    "age": "",
+    "gender": ""
+  },
+  "test_mode": false,
+  "seed": 123,
+  "trials_run": 170,
+  "measured_frame_rate_hz": 60.0,
+  "psychopy_version": "mock",
+  "python": "3.12.3",
+  "platform": "Linux-6.18.44-fc-v230-x86_64-with-glibc2.39",
+  "config": {
+    "experiment": {
+      "name": "arrow_cue",
+      "instructions": [
+        "ATTENTION TASK\n\nKeep your eyes on the centre.\nAn arrow will appear, then a shape in one of the boxes.\n\nF = circle     J = square\n\nThe arrow is usually right, but not always.\nBe fast and accurate.\n\nPress SPACE."
+      ],
+      "break_message": "Break.\n\nPress SPACE to continue.",
+      "end_message": "Thank you!\n\nThe experiment is over.",
+      "output_dir": "/home/claude/PsychoPyGeneric/example_output",
+      "seed": 123,
+      "description": "Spatial attention: a central arrow predicts (valid), misleads (invalid) or says nothing (neutral) about the side of the target. The participant names the target's shape. RT is counted from the target onset, 0.3 s after the cue starts (0.2 s cue + 0.1 s gap).",
+      "column_descriptions": {
+        "cue_type": "valid = the arrow pointed at the target side; invalid = it pointed to the other side; neutral = double-headed arrow.",
+        "target_side": "Side of the screen where the target appeared.",
+        "target_shape": "Shape of the target: circle or square.",
+        "cue.direction": "Direction the arrow really pointed: left, right, or both (neutral).",
+        "target.pos": "[x, y] position of the target in degrees from the centre (negative x = left).",
+        "target.type": "Shape type used for the target (same as target_shape).",
+        "answer": "The correct response of this trial (= the target shape)."
+      }
+    },
+    "screen": {
+      "size": [
+        1280,
+        720
+      ],
+      "fullscreen": true,
+      "screen_index": 0,
+      "bg_color": [
+        128,
+        128,
+        128
+      ],
+      "color_space": "rgb255",
+      "units": "deg",
+      "width_cm": 53.0,
+      "distance_cm": 57.0,
+      "frame_rate": 60.0,
+      "measure_frame_rate": true,
+      "hide_mouse": true,
+      "text_color": "white",
+      "text_height": null
+    },
+    "participant": {
+      "ask": false,
+      "use_dialog": true,
+      "fields": {
+        "participant": "",
+        "session": "1",
+        "age": "",
+        "gender": ""
+      }
+    },
+    "keys": {
+      "responses": {
+        "f": "circle",
+        "j": "square"
+      },
+      "escape": "escape"
+    },
+    "design": {
+      "factors": {},
+      "conditions": [
+        {
+          "cue_type": "valid",
+          "target_side": "left",
+          "target_shape": "circle",
+          "n": 3
+        },
+        {
+          "cue_type": "valid",
+          "target_side": "left",
+          "target_shape": "square",
+          "n": 3
+        },
+        {
+          "cue_type": "valid",
+          "target_side": "right",
+          "target_shape": "circle",
+          "n": 3
+        },
+        {
+          "cue_type": "valid",
+          "target_side": "right",
+          "target_shape": "square",
+          "n": 3
+        },
+        {
+          "cue_type": "invalid",
+          "target_side": "left",
+          "target_shape": "circle",
+          "n": 1
+        },
+        {
+          "cue_type": "invalid",
+          "target_side": "left",
+          "target_shape": "square",
+          "n": 1
+        },
+        {
+          "cue_type": "invalid",
+          "target_side": "right",
+          "target_shape": "circle",
+          "n": 1
+        },
+        {
+          "cue_type": "invalid",
+          "target_side": "right",
+          "target_shape": "square",
+          "n": 1
+        },
+        {
+          "cue_type": "neutral",
+          "target_side": "left",
+          "target_shape": "circle",
+          "n": 1
+        },
+        {
+          "cue_type": "neutral",
+          "target_side": "left",
+          "target_shape": "square",
+          "n": 1
+        },
+        {
+          "cue_type": "neutral",
+          "target_side": "right",
+          "target_shape": "circle",
+          "n": 1
+        },
+        {
+          "cue_type": "neutral",
+          "target_side": "right",
+          "target_shape": "square",
+          "n": 1
+        }
+      ],
+      "n_repeats": 4,
+      "n_blocks": 2,
+      "randomization": "shuffle",
+      "max_run": {
+        "variable": "cue_type",
+        "n": 4
+      },
+      "derive": "<function derive at 0x7f2d89afc900>",
+      "summary_by": [
+        "cue_type"
+      ]
+    },
+    "practice": {
+      "n_trials": 10,
+      "feedback": true,
+      "feedback_duration": 0.5,
+      "message": "Practice.\n\nPress SPACE to start.",
+      "main_message": "Practice finished.\n\nThe real experiment starts now.\n\nPress SPACE."
+    },
+    "scoring": {
+      "answer_variable": "answer",
+      "no_response_label": null
+    },
+    "test_mode": {
+      "n_trials": 6,
+      "n_practice": 0,
+      "windowed": true
+    },
+    "stimuli": {
+      "fixation": {
+        "type": "bullseye",
+        "radius": 0.3,
+        "n_rings": 3,
+        "colors": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "box_left": {
+        "type": "square",
+        "pos": [
+          -6.0,
+          0
+        ],
+        "size": 2.5,
+        "fill_color": null,
+        "line_color": "white",
+        "line_width": 3
+      },
+      "box_right": {
+        "type": "square",
+        "pos": [
+          6.0,
+          0
+        ],
+        "size": 2.5,
+        "fill_color": null,
+        "line_color": "white",
+        "line_width": 3
+      },
+      "cue": {
+        "type": "arrow",
+        "pos": [
+          0,
+          1.2
+        ],
+        "size": 1.6,
+        "direction": "right",
+        "fill_color": "white"
+      },
+      "target": {
+        "type": "circle",
+        "pos": [
+          6.0,
+          0
+        ],
+        "size": 1.0,
+        "fill_color": [
+          255,
+          255,
+          255
+        ]
+      }
+    },
+    "events": [
+      {
+        "name": "fixation",
+        "stimuli": [
+          "fixation",
+          "box_left",
+          "box_right"
+        ],
+        "duration": [
+          0.6,
+          1.0
+        ]
+      },
+      {
+        "name": "cue",
+        "stimuli": [
+          "fixation",
+          "box_left",
+          "box_right",
+          "cue"
+        ],
+        "duration": 0.2
+      },
+      {
+        "name": "gap",
+        "stimuli": [
+          "fixation",
+          "box_left",
+          "box_right"
+        ],
+        "duration": 0.1
+      },
+      {
+        "name": "target",
+        "stimuli": [
+          "fixation",
+          "box_left",
+          "box_right",
+          "target"
+        ],
+        "duration": 1.5,
+        "response": true
+      },
+      {
+        "name": "iti",
+        "stimuli": [],
+        "duration": 0.5
+      }
+    ]
+  }
+}

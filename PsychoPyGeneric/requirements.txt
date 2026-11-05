@@ -1,0 +1,3 @@
+# Recommended: install the standalone PsychoPy app, OR in a fresh virtual environment:
+psychopy
+numpy

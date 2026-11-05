@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PsychoPyGeneric: stimulus library</title>
+<style>
+:root{--bg:#fff;--fg:#1d1d1f;--mut:#5f6368;--line:#d9dce1;--card:#f5f6f8;--acc:#1a5fb4}
+@media(prefers-color-scheme:dark){:root{--bg:#17181b;--fg:#ececee;--mut:#a0a4ab;--line:#33363b;--card:#222428;--acc:#78aeed}}
+body{font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);max-width:980px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:1.9rem;margin:.2em 0}h2{margin-top:2.2em;border-bottom:1px solid var(--line);padding-bottom:.2em}h3{margin:1.6em 0 .3em}
+p,li{max-width:75ch}code{background:var(--card);padding:1px 5px;border-radius:4px;font-size:.92em}
+pre{background:var(--card);padding:12px;border-radius:8px;overflow-x:auto;font-size:.88em}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.card b{display:block}.card span{font-size:.82em;color:var(--mut)}
+canvas{display:block;margin:0 auto 6px;border-radius:6px;max-width:100%;height:auto;background:#808080}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.92em}
+th,td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}th{color:var(--mut)}
+td:first-child{white-space:nowrap;font-family:ui-monospace,monospace}td:nth-child(2){font-family:ui-monospace,monospace;color:var(--acc)}
+.pg{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}.pg label{display:grid;grid-template-columns:78px 1fr 44px;gap:8px;align-items:center;margin:4px 0;font-size:.9em}
+.note{border-left:4px solid var(--acc);background:var(--card);padding:8px 14px;border-radius:0 8px 8px 0}
+</style></head><body>
+
+<h1>Stimulus library</h1>
+<p>Everything that can be drawn on the screen lives in <code>toolbox/stimuli.py</code>. A stimulus is created from a small dictionary in your <code>config.py</code>; the <code>"type"</code> entry chooses the stimulus and every other entry sets one of its parameters. Anything you leave out takes the default value shown below.</p>
+<pre>"stimuli": {
+    "target": {"type": "gabor", "size": 4, "sf": 3, "contrast": 0.2, "pos": [6, 0]},
+    "fixation": {"type": "bullseye", "radius": 0.3}
+}</pre>
+<p>The drawings below are a faithful preview made with the same defaults and formulas, shown on the usual mid-grey background (a browser drawing, so it will differ slightly from PsychoPy's own rendering). <b>Units:</b> sizes and positions are in degrees of visual angle by default; <code>[0, 0]</code> is the screen centre, negative x is left, positive y is up.</p>
+
+<h2>1. The default stimuli</h2>
+<p>Each stimulus drawn with no parameters changed.</p>
+<div class="grid" id="gal"></div>
+
+<h2>2. Parameters of each stimulus</h2>
+<div class="note">Parameters shared by most stimuli: <code>pos</code> (centre <code>[x, y]</code>), <code>opacity</code> (0 to 1), and colours, which can be names (<code>"red"</code>), hex codes (<code>"#ff8800"</code>) or <code>[r, g, b]</code> values (0 to 255 in the default colour space). <code>None</code> as a fill colour means no fill. A parameter can be changed for one trial only with a trial variable named <code>"&lt;stimulus&gt;.&lt;parameter&gt;"</code>, for example <code>"target.contrast"</code> computed in <code>derive()</code>.</div>
+<div id="params"></div>
+
+<h2>3. The Gabor in different settings</h2>
+<p>A Gabor is a sinusoidal grating (light and dark stripes) inside a soft window. Each row below changes one parameter and keeps the others at their default (<code>size 4, sf 2, contrast 1, ori 0, phase 0, mask "gauss"</code>). Every picture is on the same scale: the frame is 6 degrees wide.</p>
+<div id="gab"></div>
+
+<h3>Playground</h3>
+<div class="pg"><canvas id="pc" width="240" height="240"></canvas><div id="ctl"></div></div>
+
+<h2>4. Add your own stimulus</h2>
+<p>You do not need to edit the toolbox. Put a function in <code>experiments/&lt;name&gt;/custom_stimuli.py</code>; it is loaded automatically and then works with <code>"type": "my_square"</code>.</p>
+<pre>from psychopy import visual
+from toolbox.stimuli import register_stimulus
+
+@register_stimulus("my_square")
+def my_square(win, cs, rng, pos=(0, 0), size=1.0, color="white"):
+    return visual.Rect(win, width=size, height=size, pos=pos, fillColor=color, colorSpace=cs)</pre>
+
+<script>
+const W='white',BG=128;
+function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c}
+function poly(x,ctx,pts,s,fill,line,lw,op){ctx.globalAlpha=op;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();
+ if(fill){ctx.fillStyle=fill;ctx.fill()}if(line){ctx.strokeStyle=line;ctx.lineWidth=lw;ctx.stroke()}ctx.globalAlpha=1}
+// draw one stimulus: s = spec with defaults already merged; S = px per degree; (cx,cy) = screen centre in px
+function draw(ctx,t,s,S,cx,cy){
+ const X=v=>cx+v*S,Y=v=>cy-v*S,pp=s.pos||[0,0],px=X(pp[0]),py=Y(pp[1]),op=s.opacity??1;
+ if(t=='gabor'){const R=s.size*S,N=Math.ceil(R)+2,img=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height),d=img.data,
+   th=s.ori*Math.PI/180,cs=Math.cos(th),sn=Math.sin(th),W=img.width;
+  for(let y=0;y<img.height;y++)for(let x=0;x<W;x++){const dx=(x-px)/S,dy=(y-py)/S;
+   const r=Math.hypot(dx,dy)/(s.size/2);let e=1;
+   if(s.mask=='gauss')e=Math.exp(-4.5*r*r);else if(s.mask=='circle')e=r<=1?1:0;else e=(Math.abs(dx)<=s.size/2&&Math.abs(dy)<=s.size/2)?1:0;
+   if(!e)continue;const u=dx*cs+dy*sn,l=BG*(1+s.contrast*Math.sin(2*Math.PI*(s.sf*u+s.phase))*e*op),i=(y*W+x)*4;d[i]=d[i+1]=d[i+2]=l}
+  ctx.putImageData(img,0,0);return}
+ if(t=='bullseye'){for(let i=0;i<s.n_rings;i++){const r=s.radius*(1-i*(1-1/s.n_rings)/(s.n_rings-1||1));ctx.globalAlpha=op;ctx.fillStyle=s.colors[i%s.colors.length];ctx.beginPath();ctx.arc(px,py,r*S,0,7);ctx.fill()}ctx.globalAlpha=1;return}
+ if(t=='gap_circle'){const c={right:0,up:90,left:180,down:270}[s.gap_side]??0,h=s.gap_angle/2;ctx.strokeStyle=s.color;ctx.lineWidth=s.line_width;ctx.beginPath();
+  if(!s.gap_side)ctx.arc(px,py,s.radius*S,0,7);else ctx.arc(px,py,s.radius*S,-(c+360-h)*Math.PI/180,-(c+h)*Math.PI/180);ctx.stroke();return}
+ if(t=='circle'){ctx.globalAlpha=op;ctx.beginPath();ctx.arc(px,py,s.size/2*S,0,7);if(s.fill_color){ctx.fillStyle=s.fill_color;ctx.fill()}if(s.line_color){ctx.strokeStyle=s.line_color;ctx.lineWidth=s.line_width;ctx.stroke()}ctx.globalAlpha=1;return}
+ const rot=(pts,o)=>pts.map(p=>{const a=o*Math.PI/180;return[px+(p[0]*Math.cos(a)+p[1]*Math.sin(a))*S,py-(-p[0]*Math.sin(a)+p[1]*Math.cos(a))*S]});
+ if(t=='square'||t=='rectangle'){const w=(s.width??s.size)/2,h=(s.height??s.size)/2;poly(0,ctx,rot([[-w,-h],[w,-h],[w,h],[-w,h]],s.ori),0,s.fill_color,s.line_color,s.line_width,op);return}
+ if(t=='polygon'||t=='triangle'||t=='diamond'){const n=t=='triangle'?3:t=='diamond'?4:s.edges,r=s.size/2,p=[];for(let i=0;i<n;i++){const a=(90-360*i/n)*Math.PI/180;p.push([r*Math.cos(a),r*Math.sin(a)])}
+  poly(0,ctx,rot(p,s.ori),0,s.fill_color,s.line_color,s.line_width,op);return}
+ if(t=='line'){ctx.globalAlpha=op;ctx.strokeStyle=s.color;ctx.lineWidth=s.line_width;ctx.beginPath();ctx.moveTo(X(s.start[0]),Y(s.start[1]));ctx.lineTo(X(s.end[0]),Y(s.end[1]));ctx.stroke();ctx.globalAlpha=1;return}
+ if(t=='arrow'){const L=s.size,hl=s.head_length*L,hw=s.head_width*L/2,sw=s.shaft_width*L/2,xs=L/2-hl;let v,o=0;
+  if(s.direction=='both')v=[[-L/2,0],[-xs,hw],[-xs,sw],[xs,sw],[xs,hw],[L/2,0],[xs,-hw],[xs,-sw],[-xs,-sw],[-xs,-hw]];
+  else{v=[[-L/2,-sw],[xs,-sw],[xs,-hw],[L/2,0],[xs,hw],[xs,sw],[-L/2,sw]];o={right:0,down:90,left:180,up:270}[s.direction]}
+  poly(0,ctx,rot(v,o),0,s.fill_color,s.line_color,s.line_width,op);return}
+ if(t=='text'){ctx.globalAlpha=op;ctx.fillStyle=s.color;ctx.font=(s.height*S*1.3)+'px '+s.font+',sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.text,px,py);ctx.globalAlpha=1}
+}
+const FILL={fill_color:W,line_color:null,line_width:2,ori:0,opacity:1,pos:[0,0]};
+const DEF={gabor:{pos:[0,0],size:4,sf:2,ori:0,phase:0,contrast:1,mask:'gauss',color:W,opacity:1},
+ bullseye:{pos:[0,0],radius:.5,n_rings:3,colors:['black',W],opacity:1},
+ gap_circle:{pos:[0,0],radius:1.5,gap_side:'left',gap_angle:60,line_width:3,color:W},
+ circle:{...FILL,size:1},square:{...FILL,size:1},rectangle:{...FILL,width:2,height:1},
+ polygon:{...FILL,size:1,edges:5},triangle:{...FILL,size:1},diamond:{...FILL,size:1},
+ line:{start:[-1,0],end:[1,0],color:W,line_width:3,opacity:1},
+ arrow:{pos:[0,0],size:2,direction:'right',fill_color:W,line_color:null,line_width:2,shaft_width:.15,head_length:.4,head_width:.5,opacity:1},
+ text:{text:'+',pos:[0,0],height:1,color:W,ori:0,font:'Arial',opacity:1}};
+function sp(t,o){return{...DEF[t],...o}}
+function fig(parent,t,o,S,size,cap,sub){const c=mk(size,size),x=c.getContext('2d');x.fillStyle='#808080';x.fillRect(0,0,size,size);
+ if(t=='array'){const T={type:'triangle',fill_color:'red'},D=[{type:'circle',fill_color:'red'},{type:'triangle',fill_color:'green'}];let k=0;
+  for(let r=0;r<3;r++)for(let q=0;q<3;q++){if(r==2&&q==2)continue;const sx=(q-1)*2,sy=(1-r)*2,u=(r==0&&q==1)?T:D[k++%2];draw(x,u.type,sp(u.type,{...u,pos:[sx,sy]}),S,size/2,size/2)}}
+ else draw(x,t,sp(t,o),S,size/2,size/2);
+ const d=document.createElement('div');d.className='card';d.appendChild(c);d.insertAdjacentHTML('beforeend','<b>'+cap+'</b>'+(sub?'<span>'+sub+'</span>':''));parent.appendChild(d);return c}
+
+// ---- 1. gallery of defaults
+const gal=document.getElementById('gal');
+[['gabor','gabor','size 4, sf 2'],['bullseye','bullseye','radius 0.5, 3 rings'],['gap_circle','gap_circle','gap on the left'],['circle','circle','size 1'],['square','square','size 1'],
+ ['rectangle','rectangle','2 x 1'],['polygon','polygon','5 edges'],['triangle','triangle','3 edges'],['diamond','diamond','4 edges'],['line','line','(-1,0) to (1,0)'],['arrow','arrow','direction right'],
+ ['arrow','arrow, both',"direction 'both'",{direction:'both'}],['text','text','"+" height 1'],['array','search_array','8 items, grid, 1 target']].forEach(a=>fig(gal,a[0],a[3]||{},a[0]=='array'?22:30,150,a[1],a[2]));
+
+// ---- 2. parameter tables
+const P={
+gabor:['Sinusoidal grating in a soft window; the classic stimulus of vision research.',[['pos','[0, 0]','Centre [x, y].'],['size','4.0','Diameter of the window.'],['sf','2.0','Spatial frequency: stripe cycles per degree (with units "deg").'],['ori','0.0','Orientation in degrees, clockwise from vertical stripes.'],['phase','0.0','Where the stripes start within a cycle, 0 to 1.'],['contrast','1.0','Strength of the stripes: 0 (invisible) to 1 (full).'],['mask','"gauss"','Window: "gauss" (soft edge), "circle" (hard edge) or None (square).'],['color','"white"','Colour of the bright bars.'],['opacity','1.0','Transparency of the whole patch.']]],
+bullseye:['Concentric discs alternating between the colours; the outer one is drawn first. Used as a fixation point.',[['pos','[0, 0]','Centre.'],['radius','0.5','Radius of the outer disc.'],['n_rings','3','Number of discs.'],['colors','("black","white")','Colours used in turn, outer to inner.'],['opacity','1.0','Transparency.']]],
+gap_circle:['Ring with a gap; the gap side works as a directional cue.',[['pos','[0, 0]','Centre.'],['radius','1.5','Radius of the ring.'],['gap_side','"left"','"left", "right", "up", "down" or None (closed ring).'],['gap_angle','60.0','Width of the gap in degrees.'],['line_width','3.0','Thickness of the line.'],['color','"white"','Line colour.']]],
+'circle, square':['Plain filled or outlined shapes. For a circle, size is the diameter.',[['pos','[0, 0]','Centre.'],['size','1.0','Diameter (circle) or side length (square).'],['fill_color','"white"','Fill; None = outline only.'],['line_color','None','Outline colour; None = no outline.'],['line_width','2.0','Outline thickness.'],['ori','0.0','Rotation in degrees, clockwise.'],['opacity','1.0','Transparency.']]],
+rectangle:['Like the square, with separate width and height.',[['width','2.0','Horizontal side.'],['height','1.0','Vertical side.'],['pos, fill_color, line_color, line_width, ori, opacity','','Same as for the square.']]],
+'polygon, triangle, diamond':['Regular polygon; size is the diameter of the circle around it. triangle = 3 edges and diamond = 4 edges.',[['edges','5','Number of sides (polygon only).'],['size','1.0','Diameter of the circumscribed circle.'],['pos, fill_color, line_color, line_width, ori, opacity','','Same as for the square.']]],
+line:['Straight line between two points.',[['start','[-1, 0]','First end point.'],['end','[1, 0]','Second end point.'],['color','"white"','Line colour.'],['line_width','3.0','Thickness.'],['opacity','1.0','Transparency.']]],
+arrow:['Arrow of total length size. Used as a cue.',[['pos','[0, 0]','Centre.'],['size','2.0','Total length.'],['direction','"right"','"left", "right", "up", "down" or "both" (double-headed, horizontal).'],['fill_color','"white"','Fill colour.'],['line_color, line_width','None, 2.0','Outline.'],['shaft_width','0.15','Thickness of the shaft, as a fraction of size.'],['head_length','0.4','Length of the head, fraction of size.'],['head_width','0.5','Width of the head, fraction of size.'],['opacity','1.0','Transparency.']]],
+text:['Any text, such as a fixation cross.',[['text','"+"','The characters to show.'],['pos','[0, 0]','Centre.'],['height','1.0','Letter height.'],['color','"white"','Text colour.'],['ori','0.0','Rotation.'],['font','"Arial"','Font name.'],['opacity','1.0','Transparency.']]],
+search_array:['Several shapes with (optionally) one target, for visual search. The target and distractors are stimulus dictionaries, for example {"type": "triangle", "fill_color": "red"}.',[['n_items','8','Total number of items.'],['target_present','True','Whether one item is the target.'],['target','red triangle','Dictionary describing the target.'],['distractors','red circle, green triangle','List of dictionaries; shared out evenly and shuffled.'],['item_size','1.0','Size of each item.'],['layout','"grid"','"grid", "ring" or "random".'],['center','(0, 0)','Centre of the array.'],['grid_shape','None','(rows, columns) for the grid; default is as square as possible.'],['spacing','2.0','Distance between grid cells.'],['radius','5.0','Radius of the ring layout.'],['area','(12, 8)','Width and height of the random layout.'],['min_dist','1.5','Minimum distance between items (random layout).'],['jitter','0.0','Random shift added to every position.']]]};
+const pe=document.getElementById('params');
+for(const k in P){const[d,r]=P[k];pe.insertAdjacentHTML('beforeend','<h3><code>'+k+'</code></h3><p>'+d+'</p><div class="tw"><table><tr><th>Parameter</th><th>Default</th><th>What it does</th></tr>'+r.map(x=>'<tr><td>'+x[0]+'</td><td>'+x[1]+'</td><td>'+x[2]+'</td></tr>').join('')+'</table></div>')}
+
+// ---- 3. Gabor variations
+const ge=document.getElementById('gab');
+function row(title,text,list){const g=document.createElement('div');g.className='grid';ge.insertAdjacentHTML('beforeend','<h3>'+title+'</h3><p>'+text+'</p>');ge.appendChild(g);
+ list.forEach(l=>fig(g,'gabor',l[0],30,180,l[1],l[2]))}
+row('Size','<code>size</code> is the diameter of the window, in degrees.',[1,2,3,5].map(v=>[{size:v},'size = '+v]));
+row('Spatial frequency','<code>sf</code> is the number of light-dark cycles per degree: a higher value gives finer stripes.',[.5,1,2,4].map(v=>[{sf:v},'sf = '+v,v+' cycles/deg']));
+row('Contrast','<code>contrast</code> goes from 1 (full strength) down to 0 (invisible). Detection experiments use values near threshold, such as 0.08.',[1,.5,.2,.08].map(v=>[{contrast:v},'contrast = '+v]));
+row('Orientation','<code>ori</code> is in degrees, clockwise from vertical stripes. Discrimination tasks use small tilts, such as the &plusmn;4 degrees in the example experiment.',[[0,''],[4,'(tilt right)'],[-4,'(tilt left)'],[45,''],[90,'(horizontal)']].map(v=>[{ori:v[0],size:3},'ori = '+v[0],v[1]]));
+row('Phase','<code>phase</code> slides the stripes sideways without changing their spacing (0 to 1 is one full cycle).',[0,.25,.5,.75].map(v=>[{phase:v},'phase = '+v]));
+row('Mask','<code>mask</code> sets the window: soft Gaussian edge, hard circle, or none (square patch).',[['gauss','"gauss"'],['circle','"circle"'],[null,'None']].map(v=>[{mask:v[0]},'mask = '+v[1]]));
+row('Combined settings','Several parameters changed together.',[[{contrast:.08,sf:3,size:4},'faint','contrast 0.08, sf 3, size 4'],[{contrast:1,sf:6,size:3},'fine and strong','contrast 1, sf 6, size 3'],[{contrast:.6,sf:.7,size:2,ori:45},'small and coarse','contrast 0.6, sf 0.7, size 2, ori 45'],[{contrast:.5,sf:3,size:4,ori:-4},'tilted left','contrast 0.5, sf 3, ori -4']]);
+
+// ---- playground
+const pc=document.getElementById('pc'),pctx=pc.getContext('2d'),st={size:4,sf:2,contrast:1,ori:0,phase:0,mask:'gauss'},ctl=document.getElementById('ctl');
+function rd(){pctx.fillStyle='#808080';pctx.fillRect(0,0,240,240);draw(pctx,'gabor',sp('gabor',st),240/6,120,120)}
+[['size',.5,6,.5],['sf',.2,8,.1],['contrast',0,1,.02],['ori',-90,90,1],['phase',0,1,.05]].forEach(a=>{const l=document.createElement('label');l.innerHTML=a[0]+'<input type="range" min="'+a[1]+'" max="'+a[2]+'" step="'+a[3]+'" value="'+st[a[0]]+'"><span>'+st[a[0]]+'</span>';
+ l.querySelector('input').oninput=e=>{st[a[0]]=+e.target.value;l.querySelector('span').textContent=e.target.value;rd()};ctl.appendChild(l)});
+const ml=document.createElement('label');ml.innerHTML='mask<select><option>gauss</option><option>circle</option><option>none</option></select>';ml.querySelector('select').onchange=e=>{st.mask=e.target.value;rd()};ctl.appendChild(ml);
+rd();
+</script></body></html>

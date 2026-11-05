@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use PsychoPyGeneric in your research, please cite this software."
+title: "PsychoPyGeneric: A Generic Toolbox for Visual Behavioral Experiments"
+type: software
+authors:
+  - family-names: Bencherif
+    given-names: Ouail
+  - family-names: Catherine dit feret
+    given-names: Maëlys
+  - family-names: Indran
+    given-names: Ashwina
+version: 1.0.0
+date-released: 2026-11-04
+license: MIT

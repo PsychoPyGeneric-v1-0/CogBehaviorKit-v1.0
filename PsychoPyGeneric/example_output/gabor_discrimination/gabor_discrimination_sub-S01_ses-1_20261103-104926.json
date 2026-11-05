@@ -1,0 +1,205 @@
+{
+  "status": "completed",
+  "started": "2026-11-03 10:49:26",
+  "finished": "2026-11-03 10:49:56",
+  "participant": {
+    "participant": "S01",
+    "session": "1",
+    "age": "",
+    "gender": ""
+  },
+  "test_mode": false,
+  "seed": 123,
+  "trials_run": 168,
+  "measured_frame_rate_hz": 60.0,
+  "psychopy_version": "mock",
+  "python": "3.12.3",
+  "platform": "Linux-6.18.44-fc-v230-x86_64-with-glibc2.39",
+  "config": {
+    "experiment": {
+      "name": "gabor_discrimination",
+      "instructions": [
+        "GABOR TASK\n\nIs the patch tilted LEFT or RIGHT of vertical?\n\nLEFT arrow / RIGHT arrow\n\nPress SPACE."
+      ],
+      "break_message": "Break.\n\nPress SPACE to continue.",
+      "end_message": "Thank you!\n\nThe experiment is over.",
+      "output_dir": "/home/claude/PsychoPyGeneric/example_output",
+      "seed": 123,
+      "description": "Gabor discrimination at several contrast levels. The Gabor is shown briefly, then the participant answers on a response screen (RT is counted from that screen).",
+      "column_descriptions": {
+        "gabor.contrast": "Contrast of the Gabor (0 = invisible, 1 = maximum).",
+        "tilt": "Discrimination: -1 = tilted left, +1 = tilted right.",
+        "side": "Side of the screen where the Gabor (and cue) appeared.",
+        "gabor.pos": "[x, y] position of the Gabor in degrees from the centre (negative x = left).",
+        "cue.pos": "[x, y] position of the ring cue (same as the Gabor).",
+        "gabor.ori": "Orientation of the Gabor in degrees, clockwise from vertical.",
+        "answer": "The correct response of this trial."
+      }
+    },
+    "screen": {
+      "size": [
+        1280,
+        720
+      ],
+      "fullscreen": false,
+      "screen_index": 0,
+      "bg_color": [
+        128,
+        128,
+        128
+      ],
+      "color_space": "rgb255",
+      "units": "deg",
+      "width_cm": 53.0,
+      "distance_cm": 57.0,
+      "frame_rate": 60.0,
+      "measure_frame_rate": true,
+      "hide_mouse": true,
+      "text_color": "white",
+      "text_height": null
+    },
+    "participant": {
+      "ask": false,
+      "use_dialog": true,
+      "fields": {
+        "participant": "",
+        "session": "1",
+        "age": "",
+        "gender": ""
+      }
+    },
+    "keys": {
+      "responses": {
+        "left": "left",
+        "right": "right"
+      },
+      "escape": "escape"
+    },
+    "design": {
+      "factors": {
+        "gabor.contrast": [
+          0.02,
+          0.04,
+          0.08,
+          0.16,
+          0.32
+        ],
+        "tilt": [
+          -1,
+          1
+        ],
+        "side": [
+          "left",
+          "right"
+        ]
+      },
+      "conditions": null,
+      "n_repeats": 4,
+      "n_blocks": 2,
+      "randomization": "shuffle",
+      "max_run": null,
+      "derive": "<function derive at 0x7f2d8a2ce3e0>",
+      "summary_by": [
+        "gabor.contrast"
+      ]
+    },
+    "practice": {
+      "n_trials": 8,
+      "feedback": true,
+      "feedback_duration": 0.5,
+      "message": "Practice.\n\nPress SPACE to start.",
+      "main_message": "Practice finished.\n\nThe real experiment starts now.\n\nPress SPACE."
+    },
+    "scoring": {
+      "answer_variable": "answer",
+      "no_response_label": null
+    },
+    "test_mode": {
+      "n_trials": 6,
+      "n_practice": 0,
+      "windowed": true
+    },
+    "stimuli": {
+      "fixation": {
+        "type": "bullseye",
+        "radius": 0.3,
+        "n_rings": 3,
+        "colors": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ]
+        ]
+      },
+      "cue": {
+        "type": "gap_circle",
+        "radius": 2.5,
+        "gap_side": null,
+        "line_width": 3,
+        "color": "white"
+      },
+      "gabor": {
+        "type": "gabor",
+        "size": 4.0,
+        "sf": 3.0,
+        "phase": 0.0,
+        "contrast": 0.2,
+        "mask": "gauss"
+      }
+    },
+    "events": [
+      {
+        "name": "fixation",
+        "stimuli": [
+          "fixation"
+        ],
+        "duration": [
+          0.5,
+          1.0
+        ]
+      },
+      {
+        "name": "cue",
+        "stimuli": [
+          "fixation",
+          "cue"
+        ],
+        "duration": 0.1
+      },
+      {
+        "name": "gap",
+        "stimuli": [
+          "fixation"
+        ],
+        "duration": 0.05
+      },
+      {
+        "name": "target",
+        "stimuli": [
+          "fixation",
+          "gabor"
+        ],
+        "duration": 0.1
+      },
+      {
+        "name": "respond",
+        "stimuli": [
+          "fixation"
+        ],
+        "duration": 2.0,
+        "response": true
+      },
+      {
+        "name": "iti",
+        "stimuli": [],
+        "duration": 0.5
+      }
+    ]
+  }
+}

@@ -1,0 +1,89 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><title>01_build_from_scratch</title><style>
+body{font-family:Segoe UI,Arial,sans-serif;max-width:60rem;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#222}
+h1,h2,h3{border-bottom:1px solid #ddd;padding-bottom:.2rem;margin-top:2rem}
+table{border-collapse:collapse;margin:1rem 0;width:100%}
+th,td{border:1px solid #bbb;padding:.4rem .7rem;text-align:left;vertical-align:top}
+th{background:#eef2f7}
+tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:.1rem .3rem;border-radius:3px;font-family:Consolas,monospace}
+pre{background:#f3f3f3;padding:.8rem;border-radius:5px;overflow-x:auto}
+pre code{background:none;padding:0}
+blockquote{border-left:4px solid #e0a800;margin:1rem 0;padding:.2rem 1rem;background:#fff8e1}
+</style></head><body><h1>Tutorial 1: build an experiment from scratch</h1>
+<p>Goal: a <strong>simple RT task</strong>. A fixation cross appears, then a coloured circle on the left or right.
+Press <strong>F</strong> for a red circle and <strong>J</strong> for a green circle.</p>
+<h2>Step 1: copy the template</h2>
+<pre><code>cp template/generic_experiment.py experiments/colour_rt.py     # or make a folder experiments/colour_rt/config.py
+</code></pre>
+<p>Easiest for the launcher: create the folder <code>experiments/colour_rt/</code> containing a <code>config.py</code> that defines
+<code>CONFIG</code> (copy the <code>CONFIG = {...}</code> part of the template; <code>run.py</code> can be copied from another example).</p>
+<h2>Step 2: screen and colours</h2>
+<pre><code class="language-python">&quot;screen&quot;: {&quot;size&quot;: [1280, 720], &quot;bg_color&quot;: [128, 128, 128], &quot;color_space&quot;: &quot;rgb255&quot;, &quot;units&quot;: &quot;deg&quot;,
+           &quot;width_cm&quot;: 53, &quot;distance_cm&quot;: 57},
+</code></pre>
+<p><code>rgb255</code> means every colour is 0-255 (grey = 128). With <code>"rgb"</code> it would be -1..1 (grey = 0). The toolbox
+checks that your numbers fit the chosen space and stops with a clear message otherwise.
+Measure your own screen width and viewing distance: they define what a "degree" is.</p>
+<h2>Step 3: stimuli</h2>
+<pre><code class="language-python">&quot;stimuli&quot;: {
+    &quot;fixation&quot;: {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;+&quot;, &quot;height&quot;: 1.0},
+    &quot;dot&quot;:      {&quot;type&quot;: &quot;circle&quot;, &quot;size&quot;: 1.5},
+},
+</code></pre>
+<p>Available types: <code>python -c "from toolbox.stimuli import available_stimuli; print(available_stimuli())"</code>
+(needs PsychoPy installed). Parameters are the keyword arguments in <code>toolbox/stimuli.py</code>.</p>
+<h2>Step 4: design (conditions)</h2>
+<pre><code class="language-python">&quot;design&quot;: {&quot;factors&quot;: {&quot;colour&quot;: [&quot;red&quot;, &quot;green&quot;], &quot;side&quot;: [&quot;left&quot;, &quot;right&quot;]},
+           &quot;n_repeats&quot;: 10, &quot;n_blocks&quot;: 2, &quot;derive&quot;: derive, &quot;summary_by&quot;: [&quot;colour&quot;]},
+</code></pre>
+<p>This crosses colour x side (4 conditions) x 10 repeats = 40 trials per block, shuffled.
+Use <code>"seed": 42</code> in <code>experiment</code> to get the same order every time.</p>
+<h2>Step 5: link conditions to stimulus parameters</h2>
+<p>A trial variable named <code>"&lt;stimulus&gt;.&lt;parameter&gt;"</code> changes that parameter for that trial. Compute them in <code>derive</code>:</p>
+<pre><code class="language-python">COLOURS = {&quot;red&quot;: [230, 40, 40], &quot;green&quot;: [40, 170, 60]}
+def derive(trial, rng):
+    return {&quot;dot.fill_color&quot;: COLOURS[trial[&quot;colour&quot;]],
+            &quot;dot.pos&quot;: [-5 if trial[&quot;side&quot;] == &quot;left&quot; else 5, 0],
+            &quot;answer&quot;: trial[&quot;colour&quot;]}
+</code></pre>
+<p><code>"dot.visible": False</code> hides a stimulus on a trial (useful for catch trials).</p>
+<h2>Step 6: keys, scoring, events</h2>
+<pre><code class="language-python">&quot;keys&quot;: {&quot;responses&quot;: {&quot;f&quot;: &quot;red&quot;, &quot;j&quot;: &quot;green&quot;}},      # key -&gt; label
+&quot;scoring&quot;: {&quot;answer_variable&quot;: &quot;answer&quot;},               # correct if label == trial[&quot;answer&quot;]
+&quot;events&quot;: [
+    {&quot;name&quot;: &quot;fixation&quot;, &quot;stimuli&quot;: [&quot;fixation&quot;], &quot;duration&quot;: [0.5, 1.0]},        # jittered
+    {&quot;name&quot;: &quot;target&quot;,   &quot;stimuli&quot;: [&quot;fixation&quot;, &quot;dot&quot;], &quot;duration&quot;: 2.0, &quot;response&quot;: True},
+    {&quot;name&quot;: &quot;iti&quot;,      &quot;stimuli&quot;: [], &quot;duration&quot;: 0.5},
+],
+</code></pre>
+<p>Durations are in seconds and are rounded to whole screen frames. The event with <code>"response": True</code> measures RT
+from its first screen refresh and ends at the keypress (or after <code>duration</code>, which then acts as a timeout).</p>
+<h2>Step 7: check, test, run</h2>
+<pre><code>python run_experiment.py colour_rt --check display      # resolution, frame rate, pixels/degree
+python run_experiment.py colour_rt --check timing       # requested vs measured durations
+python run_experiment.py colour_rt --check keyboard
+python run_experiment.py colour_rt --check preview      # look at each stimulus
+python run_experiment.py colour_rt --test               # 6 trials, data in data/test/
+python run_experiment.py colour_rt --participant 01     # real run
+</code></pre>
+<p>Press <strong>Esc</strong> at any time to abort; data recorded so far are kept.</p>
+<h2>Step 8: add a stimulus of your own</h2>
+<p>Create <code>experiments/colour_rt/custom_stimuli.py</code> (loaded automatically by the launcher):</p>
+<pre><code class="language-python">from psychopy import visual
+from toolbox.stimuli import register_stimulus
+
+@register_stimulus(&quot;cross&quot;)
+def cross(win, cs, rng, pos=(0, 0), size=1.0, color=&quot;white&quot;, line_width=3):
+    return visual.ShapeStim(win, vertices=[(-size/2, 0), (size/2, 0), (0, 0), (0, size/2), (0, -size/2)],
+                            closeShape=False, pos=pos, lineColor=color, lineWidth=line_width, colorSpace=cs)
+</code></pre>
+<p>Then use <code>{"type": "cross", "size": 1.2}</code> in <code>stimuli</code>. Nothing else changes.</p>
+<h2>Step 9: look at the data</h2>
+<p>Every run saves three files: the CSV, a <code>_README.txt</code> that explains every column of that CSV in plain words
+(read it first!), and a <code>.json</code> with the settings. To get explanations of YOUR columns in that README, fill
+<code>experiment -&gt; column_descriptions</code> in your config.
+Open the CSV (Excel, R, pandas). Key columns: <code>rt</code> (seconds), <code>response</code>, <code>correct</code>, <code>timed_out</code>, your trial variables,
+<code>planned_&lt;event&gt;_ms</code> vs <code>measured_&lt;event&gt;_ms</code> durations (milliseconds), <code>dropped_frames</code>. A summary prints at the end of each run.</p>
+<h2>Beyond the config: custom logic</h2>
+<p>Subclass <code>Experiment</code> in <code>experiments/colour_rt/task.py</code> (class name <code>Task</code>) and override <code>prepare_trial</code> or
+<code>score_trial</code>. The launcher uses it automatically.</p></body></html>

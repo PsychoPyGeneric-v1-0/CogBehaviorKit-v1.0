@@ -1,0 +1,373 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><title>README</title><style>
+body{font-family:Segoe UI,Arial,sans-serif;max-width:60rem;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#222}
+h1,h2,h3{border-bottom:1px solid #ddd;padding-bottom:.2rem;margin-top:2rem}
+table{border-collapse:collapse;margin:1rem 0;width:100%}
+th,td{border:1px solid #bbb;padding:.4rem .7rem;text-align:left;vertical-align:top}
+th{background:#eef2f7}
+tr:nth-child(even) td{background:#fafafa}
+code{background:#f3f3f3;padding:.1rem .3rem;border-radius:3px;font-family:Consolas,monospace}
+pre{background:#f3f3f3;padding:.8rem;border-radius:5px;overflow-x:auto}
+pre code{background:none;padding:0}
+blockquote{border-left:4px solid #e0a800;margin:1rem 0;padding:.2rem 1rem;background:#fff8e1}
+</style></head><body><h1>PsychoPyGeneric</h1>
+<p>A small, configuration-driven toolbox for <strong>visual behavioral experiments</strong> with PsychoPy. You describe an
+experiment in one Python dictionary (screen, stimuli, trial events, design, keys); the toolbox runs it,
+times it in screen frames, records RTs and saves the data safely. No GUI, no need to rewrite code.</p>
+<h2>What is included</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generic experiment template</td>
+<td><code>template/generic_experiment.py</code></td>
+</tr>
+<tr>
+<td>Stimulus library (Gabor, bullseye, ring/gap cues, shapes, lines, arrows, text, visual-search arrays)</td>
+<td><code>toolbox/stimuli.py</code></td>
+</tr>
+<tr>
+<td>Engine: window, timing, responses, practice/blocks/feedback</td>
+<td><code>toolbox/experiment.py</code></td>
+</tr>
+<tr>
+<td>Config defaults, loading, validation</td>
+<td><code>toolbox/config.py</code></td>
+</tr>
+<tr>
+<td>Trial generation and randomization (seeded)</td>
+<td><code>toolbox/trials.py</code></td>
+</tr>
+<tr>
+<td>Safe data saving + summary</td>
+<td><code>toolbox/data.py</code></td>
+</tr>
+<tr>
+<td>Display/timing/keyboard/stimulus checks</td>
+<td><code>toolbox/testing.py</code></td>
+</tr>
+<tr>
+<td>3 examples: visual search, Gabor detection/discrimination, arrow-cue spatial attention</td>
+<td><code>experiments/</code></td>
+</tr>
+<tr>
+<td>Tutorials</td>
+<td><code>tutorials/</code> (from scratch; from a published paper)</td>
+</tr>
+<tr>
+<td>Example output files</td>
+<td><code>example_output/</code></td>
+</tr>
+</tbody>
+</table>
+<h2>What each file does</h2>
+<p>The project has three layers: <strong>recipes</strong> (<code>experiments/*/config.py</code>) describe an experiment, the <strong>toolbox</strong>
+(<code>toolbox/*.py</code>) does the work, and a few <strong>helpers</strong> make it easy to start and learn. Normally you only edit recipes.</p>
+<h3>Top level</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_experiment.py</code></td>
+<td>The launcher. Give it an experiment name (<code>arrow_cue</code>) and it loads that experiment's config and starts it. Handles <code>--test</code>, <code>--participant</code>, <code>--seed</code>, <code>--config</code> and <code>--check</code>.</td>
+</tr>
+<tr>
+<td><code>README.md</code></td>
+<td>This manual.</td>
+</tr>
+<tr>
+<td><code>requirements.txt</code></td>
+<td>Python packages needed (PsychoPy, numpy). Not needed if you use the PsychoPy app.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>toolbox/</code> (the engine; you do not edit these)</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config.py</code></td>
+<td>Default settings (screen, keys, timing...), loading of your config (.py or .json), and checking for mistakes (typos, colours out of range, unknown stimuli). Produces the <code>CONFIG ERROR</code> messages.</td>
+</tr>
+<tr>
+<td><code>stimuli.py</code></td>
+<td>The stimulus library. Each stimulus (<code>gabor</code>, <code>bullseye</code>, <code>gap_circle</code>, <code>circle</code>, <code>square</code>, <code>arrow</code>, <code>text</code>, <code>search_array</code>...) is a small function registered under a name; a config creates it with <code>"type": "&lt;name&gt;"</code>. New stimuli are added by registering a new function.</td>
+</tr>
+<tr>
+<td><code>trials.py</code></td>
+<td>Builds the list of trials: crosses the factors (or uses an explicit condition list), repeats, shuffles with the seed, splits into blocks, applies <code>max_run</code>. Does not use PsychoPy.</td>
+</tr>
+<tr>
+<td><code>experiment.py</code></td>
+<td>The main engine. Opens the window, asks for the participant ID, shows instructions, runs each trial's events frame by frame, measures reaction times, scores answers, shows practice feedback and handles the Esc key. Read this to understand how an experiment actually runs.</td>
+</tr>
+<tr>
+<td><code>data.py</code></td>
+<td>Saves data: creates the CSV, writes one row per trial, never overwrites files, keeps test and real data apart, writes the <code>.json</code> metadata, writes the <strong><code>_README.txt</code> that explains every column</strong>, and prints the end-of-run summary.</td>
+</tr>
+<tr>
+<td><code>testing.py</code></td>
+<td>The <code>--check</code> tools: display, timing, keyboard and stimulus preview.</td>
+</tr>
+<tr>
+<td><code>__init__.py</code></td>
+<td>Marks <code>toolbox</code> as a Python package so it can be imported. Leave it alone.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>experiments/</code> (the recipes)</h3>
+<p>Each experiment folder (<code>visual_search/</code>, <code>gabor_detection/</code>, <code>arrow_cue/</code>, <code>posner_1980_tutorial/</code>) holds the same two files:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config.py</code></td>
+<td>The description of the experiment: screen, stimuli, events, design, keys. <strong>This is the file you edit.</strong> It does nothing when run by itself.</td>
+</tr>
+<tr>
+<td><code>run.py</code></td>
+<td>A tiny start button. It calls the launcher with its folder's name, so you can start the experiment from the Run button of the PsychoPy Coder (or <code>python experiments/&lt;name&gt;/run.py</code>). You never edit it.</td>
+</tr>
+</tbody>
+</table>
+<p>Optional extra files in an experiment folder: <code>custom_stimuli.py</code> (your own stimuli, loaded automatically) and
+<code>task.py</code> (a <code>Task</code> class for custom trial logic).</p>
+<h3>Other folders</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>template/generic_experiment.py</code></td>
+<td>The empty starting point for a new experiment: a minimal working experiment with its config and start code in one file. Copy it and modify it.</td>
+</tr>
+<tr>
+<td><code>tutorials/01_build_from_scratch.md</code></td>
+<td>Step-by-step guide to building a new experiment, including a custom stimulus.</td>
+</tr>
+<tr>
+<td><code>tutorials/02_from_paper_to_code.md</code></td>
+<td>How to turn a published paper's Methods into a config (Posner, 1980).</td>
+</tr>
+<tr>
+<td><code>example_output/</code></td>
+<td>Sample CSV/JSON files showing the data format. Values are dummy (made by a fake participant).</td>
+</tr>
+<tr>
+<td><code>tools/make_example_output.py</code></td>
+<td>The script that generated those samples. Not needed for normal use.</td>
+</tr>
+</tbody>
+</table>
+<h3>Created when you run</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/</code></td>
+<td>Your CSV, column-guide (<code>_README.txt</code>) and JSON files (<code>data/&lt;experiment&gt;/</code>; test runs in <code>data/test/</code>).</td>
+</tr>
+<tr>
+<td><code>__pycache__/</code></td>
+<td>Created automatically by Python to start faster. Ignore or delete.</td>
+</tr>
+</tbody>
+</table>
+<h3>What to touch and what not to touch</h3>
+<table>
+<thead>
+<tr>
+<th>Safe to edit (this is what you are meant to change)</th>
+<th>Leave alone (unless you know what you are doing)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>experiments/&lt;name&gt;/config.py</code>: stimuli, colours, keys, timing, conditions, number of trials, screen settings</td>
+<td><code>toolbox/</code> (all files): the engine. A small edit can break every experiment at once</td>
+</tr>
+<tr>
+<td>A <strong>copy</strong> of <code>template/generic_experiment.py</code> for a new experiment</td>
+<td><code>run_experiment.py</code>, the launcher</td>
+</tr>
+<tr>
+<td><code>experiments/&lt;name&gt;/custom_stimuli.py</code>: your own new stimuli (you create this file)</td>
+<td><code>experiments/&lt;name&gt;/run.py</code>: the start button, nothing to change in it</td>
+</tr>
+<tr>
+<td><code>experiments/&lt;name&gt;/task.py</code>: custom trial logic (advanced, optional, you create it)</td>
+<td><code>__init__.py</code> files and <code>__pycache__/</code> folders</td>
+</tr>
+<tr>
+<td>Your data in <code>data/</code>: copy files elsewhere to analyse them</td>
+<td><code>example_output/</code> and <code>tools/</code>: samples only</td>
+</tr>
+</tbody>
+</table>
+<p>Rules of thumb:
+- <strong>Keep a backup copy</strong> of a working <code>config.py</code> before experimenting (for example <code>config_backup.py</code>).
+- <strong>Do not edit the original template.</strong> Copy it first, and edit the copy.
+- <strong>Do not edit data files while an experiment is running.</strong> Excel can lock a CSV and block saving.
+- <strong>Do not rename or move the <code>toolbox</code> folder.</strong> Experiments look for it by that name and location.
+- Keep the <strong>quotes, commas, brackets and colons</strong> in a config exactly as they are. Only change the values. If you get a <code>SyntaxError</code>, a comma or bracket is usually missing.
+- Change <strong>one thing at a time</strong>, then run with <code>--test</code> to check.
+- If something breaks, restore your backup, or re-extract the original zip into a fresh folder.</p>
+<h3>What happens when you press Run on <code>experiments/arrow_cue/run.py</code></h3>
+<ol>
+<li><code>run.py</code> calls <code>run_experiment.py</code> with the name <code>arrow_cue</code>.</li>
+<li>The launcher loads <code>experiments/arrow_cue/config.py</code>.</li>
+<li><code>toolbox/config.py</code> merges it with the defaults and checks it.</li>
+<li><code>toolbox/trials.py</code> builds the list of trials.</li>
+<li><code>toolbox/experiment.py</code> opens the window and runs each trial, using <code>toolbox/stimuli.py</code> to create the shapes.</li>
+<li><code>toolbox/data.py</code> saves each trial to the CSV as it goes.</li>
+</ol>
+<p>To change an experiment you only touch step 2, its <code>config.py</code>.</p>
+<h2>Install</h2>
+<ol>
+<li>Install <strong>PsychoPy</strong> (https://www.psychopy.org/download.html). Either the standalone app, or in a fresh
+   virtual environment: <code>pip install psychopy</code>. Use the Python version your PsychoPy release supports
+   (see the PsychoPy docs; PsychoPy is picky about Python versions).</li>
+<li>Download this folder. No other dependencies (<code>numpy</code> comes with PsychoPy).</li>
+<li>Run from the project folder with the same Python that has PsychoPy (in the standalone app use its Coder).</li>
+</ol>
+<h2>Run</h2>
+<pre><code>python run_experiment.py --list
+python run_experiment.py visual_search --test                    # a few trials, windowed, data in data/test/
+python run_experiment.py visual_search --participant 01 --seed 42
+python experiments/arrow_cue/run.py --participant 02             # equivalent shortcut
+</code></pre>
+<p>Esc aborts (data so far are kept). Options: <code>--test</code>, <code>--participant</code>, <code>--seed</code>, <code>--config file.json|.py</code>, <code>--check</code>.</p>
+<h2>Before real data collection (testing and calibration)</h2>
+<pre><code>python run_experiment.py &lt;exp&gt; --check display     # real window size, measured frame rate, pixels/degree, reference square
+python run_experiment.py &lt;exp&gt; --check timing      # requested vs measured durations (flip timestamps), dropped frames
+python run_experiment.py &lt;exp&gt; --check keyboard    # key names and RTs of your response keys
+python run_experiment.py &lt;exp&gt; --check preview     # each stimulus on screen
+python run_experiment.py &lt;exp&gt; --check all
+</code></pre>
+<p>Test runs (<code>--test</code>) save to <code>data/test/</code>, real runs to <code>data/&lt;experiment&gt;/</code>: they never mix.
+Always do <code>display</code> and <code>timing</code> on the actual lab computer, in fullscreen (set <code>screen.fullscreen: True</code> and
+<code>screen.size</code> to the true resolution).</p>
+<h2>How an experiment is described</h2>
+<pre><code class="language-python">CONFIG = {
+  &quot;experiment&quot;: {&quot;name&quot;: ..., &quot;output_dir&quot;: &quot;data&quot;, &quot;seed&quot;: 42, &quot;instructions&quot;: [...],
+                 &quot;description&quot;: &quot;...&quot;, &quot;column_descriptions&quot;: {&quot;cue_type&quot;: &quot;valid = ...&quot;}},   # both go into the data README
+  &quot;screen&quot;:     {&quot;size&quot;: [1280, 720], &quot;bg_color&quot;: [128,128,128], &quot;color_space&quot;: &quot;rgb255&quot;, &quot;units&quot;: &quot;deg&quot;,
+                 &quot;width_cm&quot;: 53, &quot;distance_cm&quot;: 57, &quot;fullscreen&quot;: False},
+  &quot;keys&quot;:       {&quot;responses&quot;: {&quot;f&quot;: &quot;left&quot;, &quot;j&quot;: &quot;right&quot;}},
+  &quot;design&quot;:     {&quot;factors&quot;: {...} | &quot;conditions&quot;: [...], &quot;n_repeats&quot;: 5, &quot;n_blocks&quot;: 2, &quot;derive&quot;: fn},
+  &quot;practice&quot;:   {&quot;n_trials&quot;: 8, &quot;feedback&quot;: True},
+  &quot;scoring&quot;:    {&quot;answer_variable&quot;: &quot;answer&quot;},
+  &quot;stimuli&quot;:    {&quot;gabor&quot;: {&quot;type&quot;: &quot;gabor&quot;, &quot;sf&quot;: 3, &quot;size&quot;: 4}, ...},
+  &quot;events&quot;:     [{&quot;name&quot;: &quot;target&quot;, &quot;stimuli&quot;: [&quot;fixation&quot;, &quot;gabor&quot;], &quot;duration&quot;: 0.1}, ...],
+}
+</code></pre>
+<p>Only list what you change; everything else uses <code>DEFAULTS</code> in <code>toolbox/config.py</code> (also the list of all options).
+JSON files work too (<code>--config my.json</code>), except <code>derive</code> which is a Python function.
+Typos in section or key names, out-of-range colours, unknown stimulus types and undefined stimulus names
+are reported with a clear <code>CONFIG ERROR</code>.</p>
+<p><strong>Key ideas</strong>
+- <strong>Events</strong> run in order each trial. <code>duration</code> is seconds (or <code>[min, max]</code> for jitter), converted to whole frames.
+  The single event with <code>"response": True</code> measures RT from its first flip; it ends on keypress unless
+  <code>"end_on_response": False</code>; its <code>duration</code> is the timeout (<code>None</code> = wait forever).
+- <strong>Trial variables</strong> come from <code>design.factors</code> (full crossing) or <code>design.conditions</code> (explicit list with <code>n</code> counts,
+  e.g. 80% valid cues), then <code>derive(trial, rng)</code> can add computed variables.
+- <strong><code>"&lt;stimulus&gt;.&lt;param&gt;"</code> variables</strong> override that stimulus parameter on that trial (e.g. <code>"gabor.contrast": 0.1</code>,
+  <code>"target.pos": [5, 0]</code>, <code>"target.type": "square"</code>); <code>"&lt;stimulus&gt;.visible": False</code> hides it. This is how conditions
+  reach the screen without code. Combine any number of stimuli in an event by listing them.
+- <strong>Colours</strong> are interpreted in <code>screen.color_space</code> (<code>rgb255</code>: 0-255, <code>rgb</code>: -1..1, <code>rgb1</code>: 0-1) and passed
+  consistently to every stimulus. Names (<code>"red"</code>) and hex strings also work.
+- <strong>Randomization</strong>: <code>seed</code> makes trial order, jitter and random layouts reproducible. <code>n_repeats</code> is <em>per block</em>.
+  <code>max_run</code> limits consecutive repeats of a variable.
+- <strong>Scoring</strong>: correct if the response label equals <code>trial[answer_variable]</code>; <code>no_response_label</code> supports catch trials.</p>
+<h2>Stimulus library</h2>
+<p><code>gabor</code>, <code>bullseye</code>, <code>gap_circle</code> (ring cue, gap <code>left/right/up/down</code> or closed), <code>circle</code>, <code>square</code>, <code>rectangle</code>,
+<code>polygon</code>, <code>triangle</code>, <code>diamond</code>, <code>line</code>, <code>arrow</code> (<code>left/right/up/down/both</code>), <code>text</code>, <code>search_array</code>
+(target + distractors on a <code>grid</code>, <code>ring</code> or <code>random</code> layout). Parameters are the arguments of each function in
+<code>toolbox/stimuli.py</code>. Gabor <code>sf</code> is in cycles per degree when <code>units</code> is <code>"deg"</code>; <code>ori</code> is clockwise degrees.</p>
+<h3>Add a new stimulus (no change to existing code)</h3>
+<pre><code class="language-python">from psychopy import visual
+from toolbox.stimuli import register_stimulus
+
+@register_stimulus(&quot;my_square&quot;)
+def my_square(win, cs, rng, pos=(0, 0), size=1.0, color=&quot;white&quot;):
+    return visual.Rect(win, width=size, height=size, pos=pos, fillColor=color, colorSpace=cs)
+</code></pre>
+<p>Put it in <code>experiments/&lt;name&gt;/custom_stimuli.py</code> (auto-loaded by the launcher) or import it before running.
+To combine several PsychoPy objects use <code>StimGroup([...])</code>.</p>
+<h2>Create a new experiment</h2>
+<ol>
+<li>Make <code>experiments/my_task/config.py</code> (copy <code>template/generic_experiment.py</code>'s <code>CONFIG</code>, or another example) and
+   copy a <code>run.py</code> from an example. 2. Edit the config. 3. <code>--check</code> and <code>--test</code>. 4. Run.
+Step-by-step: <code>tutorials/01_build_from_scratch.md</code>. A paper-to-code walk-through: <code>tutorials/02_from_paper_to_code.md</code>.
+Need custom trial logic? Add <code>experiments/my_task/task.py</code> with <code>class Task(Experiment)</code> overriding <code>prepare_trial</code> / <code>score_trial</code>.</li>
+</ol>
+<h2>Data</h2>
+<p>Every run creates <strong>three files</strong> in the same folder (<code>data/&lt;experiment&gt;/</code>, or <code>data/test/</code> for <code>--test</code> runs):</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;experiment&gt;_sub-&lt;ID&gt;_ses-&lt;n&gt;_&lt;date-time&gt;.csv</code></td>
+<td>The data: one row per trial. Written after every trial, never overwritten.</td>
+</tr>
+<tr>
+<td><code>..._README.txt</code></td>
+<td><strong>Explains every column of that CSV in plain words</strong>, lists the response keys and the events of a trial, and gives a quick analysis recipe. Generated automatically.</td>
+</tr>
+<tr>
+<td><code>..._&lt;date-time&gt;.json</code></td>
+<td>Settings used, seed, participant info, PsychoPy/Python versions, measured frame rate and run status (<code>completed</code>/<code>aborted</code>/<code>crashed</code>).</td>
+</tr>
+</tbody>
+</table>
+<p>Read the <code>_README.txt</code> first. It lists the columns that really exist in your file. For columns that come from
+your own experiment (conditions such as <code>cue_type</code>), the explanation is the one you wrote in the config under
+<code>experiment -&gt; column_descriptions</code> (and <code>experiment -&gt; description</code> for the task). Columns without a description
+get a generic explanation (for example <code>gabor.contrast</code> = "value of the parameter 'contrast' of the stimulus 'gabor'").</p>
+<p>Main columns: <code>participant, session, test_mode, block, trial, practice, seed</code>, your conditions, <code>response_key, response,
+rt</code> (seconds, from the onset of the response event), <code>correct, timed_out</code>, <code>planned_&lt;event&gt;_ms</code> / <code>measured_&lt;event&gt;_ms</code>
+(whole milliseconds, so Excel can never turn a duration such as 1.5 into a date), <code>dropped_frames, onset_time</code>. Practice trials have <code>practice = 1</code>.
+Careful with Excel: on French/European settings, double-clicking a CSV can show one big column, and re-saving
+from Excel rewrites it with <code>;</code> separators. Use Data &gt; From Text/CSV (delimiter: comma) and keep the original file untouched. Once a cell has been turned into a date by Excel
+the original value is lost: always reopen the original CSV.</p>
+<h2>Timing and reliability notes</h2>
+<ul>
+<li>Stimuli are drawn frame by frame; durations are whole frames (50 ms at 60 Hz = 3 frames). The actual refresh rate is measured at start.</li>
+<li>RT clock is reset on the flip that shows the response event, via PsychoPy's keyboard module (<code>psychopy.hardware.keyboard</code>).</li>
+<li>Stimuli are built <em>before</em> each trial, not during it. Very heavy trial-wise builds could still slow the gap between events, not the events.</li>
+<li>Verify with <code>--check timing</code> and the <code>measured_*_ms</code>/<code>dropped_frames</code> columns. Disable power saving, close other programs, use fullscreen.</li>
+<li>RT accuracy is bounded by the keyboard and the monitor (typically a few ms to ~20 ms); use response boxes if you need more.</li>
+</ul></body></html>

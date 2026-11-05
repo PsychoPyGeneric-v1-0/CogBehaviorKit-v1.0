@@ -1,0 +1,167 @@
+{
+  "status": "completed",
+  "started": "2026-11-03 10:49:08",
+  "finished": "2026-11-03 10:49:26",
+  "participant": {
+    "participant": "S01",
+    "session": "1",
+    "age": "",
+    "gender": ""
+  },
+  "test_mode": false,
+  "seed": 123,
+  "trials_run": 128,
+  "measured_frame_rate_hz": 60.0,
+  "psychopy_version": "mock",
+  "python": "3.12.3",
+  "platform": "Linux-6.18.44-fc-v230-x86_64-with-glibc2.39",
+  "config": {
+    "experiment": {
+      "name": "visual_search",
+      "instructions": [
+        "VISUAL SEARCH\n\nA set of coloured shapes will appear.\n\nIs there a RED CIRCLE?\n  F = present     J = absent\n\nRespond as fast and as accurately as you can.\n\nPress SPACE."
+      ],
+      "break_message": "Break.\n\nPress SPACE to continue.",
+      "end_message": "Thank you!\n\nThe experiment is over.",
+      "output_dir": "/home/claude/PsychoPyGeneric/example_output",
+      "seed": 123,
+      "description": "Visual search: report whether a red circle is present among distractors (feature vs conjunction search, 4/8/16 items).",
+      "column_descriptions": {
+        "search_type": "feature = red circle among green circles; conjunction = red circle among red squares and green circles.",
+        "search.n_items": "Number of shapes on the screen (set size).",
+        "search.target_present": "True = the red circle was on the screen, False = it was not.",
+        "answer": "The correct response: 'present' (key F) or 'absent' (key J).",
+        "search_n_items": "Same as search.n_items (written by the stimulus itself, a duplicate).",
+        "search_target_present": "Same as search.target_present (a duplicate).",
+        "search_target_pos": "[x, y] position of the red circle in degrees from the screen centre (empty when absent)."
+      }
+    },
+    "screen": {
+      "size": [
+        1280,
+        720
+      ],
+      "fullscreen": true,
+      "screen_index": 0,
+      "bg_color": [
+        128,
+        128,
+        128
+      ],
+      "color_space": "rgb255",
+      "units": "deg",
+      "width_cm": 53.0,
+      "distance_cm": 57.0,
+      "frame_rate": 60.0,
+      "measure_frame_rate": true,
+      "hide_mouse": true,
+      "text_color": "white",
+      "text_height": null
+    },
+    "participant": {
+      "ask": false,
+      "use_dialog": true,
+      "fields": {
+        "participant": "",
+        "session": "1",
+        "age": "",
+        "gender": ""
+      }
+    },
+    "keys": {
+      "responses": {
+        "f": "present",
+        "j": "absent"
+      },
+      "escape": "escape"
+    },
+    "design": {
+      "factors": {
+        "search_type": [
+          "feature",
+          "conjunction"
+        ],
+        "search.n_items": [
+          4,
+          8,
+          16
+        ],
+        "search.target_present": [
+          true,
+          false
+        ]
+      },
+      "conditions": null,
+      "n_repeats": 5,
+      "n_blocks": 2,
+      "randomization": "shuffle",
+      "max_run": null,
+      "derive": "<function derive at 0x7f2d8f44a480>",
+      "summary_by": [
+        "search_type",
+        "search.n_items",
+        "search.target_present"
+      ]
+    },
+    "practice": {
+      "n_trials": 8,
+      "feedback": true,
+      "feedback_duration": 0.5,
+      "message": "Practice.\n\nPress SPACE to start.",
+      "main_message": "Practice finished.\n\nThe real experiment starts now.\n\nPress SPACE."
+    },
+    "scoring": {
+      "answer_variable": "answer",
+      "no_response_label": null
+    },
+    "test_mode": {
+      "n_trials": 6,
+      "n_practice": 0,
+      "windowed": true
+    },
+    "stimuli": {
+      "fixation": {
+        "type": "text",
+        "text": "+",
+        "height": 1.0,
+        "color": "white"
+      },
+      "search": {
+        "type": "search_array",
+        "layout": "grid",
+        "grid_shape": [
+          4,
+          4
+        ],
+        "spacing": 2.5,
+        "item_size": 1.2,
+        "jitter": 0.25
+      }
+    },
+    "events": [
+      {
+        "name": "fixation",
+        "stimuli": [
+          "fixation"
+        ],
+        "duration": [
+          0.5,
+          0.8
+        ]
+      },
+      {
+        "name": "search",
+        "stimuli": [
+          "search"
+        ],
+        "duration": 5.0,
+        "response": true
+      },
+      {
+        "name": "iti",
+        "stimuli": [],
+        "duration": 0.5
+      }
+    ]
+  }
+}
